@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import app from './app';
 import config from './config/config';
+import { cuentaController } from './modules/cuenta';
+import { empresaController } from './modules/empresa';
 import logger from './modules/logger/logger';
 
 let server: any;
@@ -36,3 +38,6 @@ process.on('SIGTERM', () => {
     server.close();
   }
 });
+
+empresaController.recieverNewAccountEmpresa()
+cuentaController.recieverNewAccountCuenta()

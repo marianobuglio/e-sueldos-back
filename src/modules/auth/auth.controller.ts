@@ -8,8 +8,7 @@ import { emailService } from '../email';
 
 export const register = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.registerUser(req.body);
-  const tokens = await tokenService.generateAuthTokens(user);
-  res.status(httpStatus.CREATED).send({ user, tokens });
+  res.status(httpStatus.CREATED).send({ user });
 });
 
 export const login = catchAsync(async (req: Request, res: Response) => {

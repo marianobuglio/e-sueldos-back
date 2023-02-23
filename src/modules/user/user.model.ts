@@ -5,7 +5,7 @@ import toJSON from '../toJSON/toJSON';
 import paginate from '../paginate/paginate';
 import { roles } from '../../config/roles';
 import { IUserDoc, IUserModel } from './user.interfaces';
-
+const { Schema } = mongoose
 const userSchema = new mongoose.Schema<IUserDoc, IUserModel>(
   {
     name: {
@@ -42,10 +42,19 @@ const userSchema = new mongoose.Schema<IUserDoc, IUserModel>(
       enum: roles,
       default: 'user',
     },
+    profileImageUrl:{
+      type: String
+    },
     isEmailVerified: {
       type: Boolean,
       default: false,
     },
+    empresas:[
+      {
+        type: Schema.Types.ObjectId,
+        ref:'Empresa'
+      }
+    ]
   },
   {
     timestamps: true,

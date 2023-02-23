@@ -6,6 +6,11 @@ import ApiError from '../errors/ApiError';
 import pick from '../utils/pick';
 import { IOptions } from '../paginate/paginate';
 import * as userService from './user.service';
+import * as amqp  from 'amqplib';
+import config from '../../config/config';
+
+
+
 
 export const createUser = catchAsync(async (req: Request, res: Response) => {
   const user = await userService.createUser(req.body);
@@ -42,3 +47,40 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
     res.status(httpStatus.NO_CONTENT).send();
   }
 });
+
+const recieverNewAccountUser = async () =>{
+  try {
+    
+    const exchangeName = 'newCuenta'
+    const exchangeType = 'topic'
+    const queue = 'securityUser'
+    const pattern = 'cuenta.user'
+    const conn = await amqp.connect(config.amqp)   
+    const channel = await conn.createChannel()
+    await channel.assertExchange(exchangeName,exchangeType)
+    await channel.assertQueue(queue)
+    await channel.bindQueue(queue,exchangeName,pattern)
+
+    channel.consume(queue, async (message: amqp.ConsumeMessage | null) => {
+      try {
+        if(message){
+          const user = JSON.parse(message.content.toString())
+          console.log(user)
+          delete user.__v
+          await userService.updateUserById(user._id,user)
+          channel.ack(message)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })
+    
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+ recieverNewAccountUser()
+
+
+

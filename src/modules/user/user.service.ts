@@ -45,14 +45,14 @@ export const queryUsers = async (filter: Record<string, any>, options: IOptions)
  * @param {mongoose.Types.ObjectId} id
  * @returns {Promise<IUserDoc | null>}
  */
-export const getUserById = async (id: mongoose.Types.ObjectId): Promise<IUserDoc | null> => User.findById(id);
+export const getUserById = async (id: mongoose.Types.ObjectId): Promise<IUserDoc | null> => User.findById(id).populate('empresas');
 
 /**
  * Get user by email
  * @param {string} email
  * @returns {Promise<IUserDoc | null>}
  */
-export const getUserByEmail = async (email: string): Promise<IUserDoc | null> => User.findOne({ email });
+export const getUserByEmail = async (email: string): Promise<IUserDoc | null> => User.findOne({ email }).populate('empresas');
 
 /**
  * Update user by id
@@ -66,11 +66,12 @@ export const updateUserById = async (
 ): Promise<IUserDoc | null> => {
   const user = await getUserById(userId);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+   throw new Error("El usuario no existe")
   }
   if (updateBody.email && (await User.isEmailTaken(updateBody.email, userId))) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+   throw new Error("El usuario ya existe")
   }
+  updateBody.password = user.password
   Object.assign(user, updateBody);
   await user.save();
   return user;

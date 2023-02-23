@@ -21,6 +21,13 @@ const envVarsSchema = Joi.object()
     SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     CLIENT_URL: Joi.string().required().description('Client url'),
+    PROTOCOL: Joi.string().required(),
+    HOSTNAME: Joi.string().required(),
+    PORTAMQP: Joi.number().required(),
+    USERNAME: Joi.string().required(),
+    PASSWORD: Joi.string().required(),
+    VHOST: Joi.string().required(),
+    AUTHMECHANISM: Joi.required()
   })
   .unknown();
 
@@ -65,6 +72,16 @@ const config = {
     from: envVars.EMAIL_FROM,
   },
   clientUrl: envVars.CLIENT_URL,
+
+  amqp:{
+    protocol:envVars.PROTOCOL,
+    hostname:envVars.HOSTNAME,
+    port:envVars.PORTAMQP,
+    username:envVars.USERNAME,
+    password:envVars.PASSWORD,
+    vhost:envVars.VHOST,
+    authmechanism:envVars.AUTHMECHANISM
+  }
 };
 
 export default config;
